@@ -1,0 +1,24 @@
+import shutil
+
+# Modify the upload_file function in the server side code to replicate the file to multiple nodes
+def upload_file(file_path, server_urls):
+    files = {'file': open(file_path, 'rb')}
+    for server_url in server_urls:
+        response = requests.post(server_url + "/upload", files=files)
+        print(response.text)
+
+# Modify the download_file function in the client side code to handle multiple nodes and select the first available node
+def download_file(filename, server_urls):
+    for server_url in server_urls:
+        response = requests.get(server_url + f"/download/{filename}")
+        if response.status_code == 200:
+            with open(filename, 'wb') as f:
+                f.write(response.content)
+            print(f"File {filename} downloaded successfully from {server_url}")
+            return
+    print(f"Failed to download file {filename} from all servers")
+
+if _name_ == "_main_":
+    server_urls = ["http://localhost:5000", "http://localhost:5001", "http://localhost:5002"]
+    upload_file("example.txt", server_urls)
+    download_file("example.txt", server_urls)
